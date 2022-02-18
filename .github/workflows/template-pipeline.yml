@@ -45,6 +45,10 @@ on:
         required: false
         type: string
         default: './'
+      publish-directory:
+        required: false
+        type: string
+        default: './'
     secrets:
       publish-profile:
         required: false
@@ -93,7 +97,7 @@ jobs:
 
       - name: Publish
         if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (inputs.deploy-web-app == true && github.repository_owner == 'MudBlazor' && github.ref == inputs.deploy-condition) }}
-        run: dotnet publish ${{ inputs.project-directory }} -c Release --runtime win-x64 --self-contained -o ${{env.DOTNET_ROOT}}/${{ inputs.deploy-web-app-name }}
+        run: dotnet publish ${{ inputs.publish-directory }} -c Release --runtime win-x64 --self-contained -o ${{env.DOTNET_ROOT}}/${{ inputs.deploy-web-app-name }}
         
       - uses: actions/upload-artifact@v2
         if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (inputs.deploy-web-app == true && github.repository_owner == 'MudBlazor' && github.ref == inputs.deploy-condition) }}
