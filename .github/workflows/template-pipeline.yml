@@ -37,6 +37,14 @@ on:
         required: false
         type: string
         default: ''
+      working-directory:
+        required: false
+        type: string
+        default: './src'
+      project-directory:
+        required: false
+        type: string
+        default: './'
     secrets:
       publish-profile:
         required: false
@@ -47,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./src
+        working-directory: ${{ inputs.working-directory }}
     
     steps:
       - name: Checkout repository
@@ -68,13 +76,13 @@ jobs:
           include-prerelease: ${{ inputs.dotnet-prerelease }}
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ${{ inputs.project-directory }}
 
       - name: Build
-        run: dotnet build -c Release --no-restore
+        run: dotnet build ${{ inputs.project-directory }} -c Release --no-restore
 
       - name: Test
-        run: dotnet test -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByAttribute='ExcludeFromCodeCoverage' /p:Include='[MudBlazor]*' /p:SkipAutoProps=true /p:CoverletOutput='./TestResults/'
+        run: dotnet test ${{ inputs.project-directory }} -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByAttribute='ExcludeFromCodeCoverage' /p:Include='[MudBlazor]*' /p:SkipAutoProps=true /p:CoverletOutput='./TestResults/'
 
       - name: Coverage
         if: ${{ inputs.publish-coverage == true }}
@@ -85,7 +93,7 @@ jobs:
 
       - name: Publish
         if: ${{ inputs.deploy-web-app == true }}
-        run: dotnet publish ./MudBlazor.Docs.Server -c Release --runtime win-x64 --self-contained -o ${{env.DOTNET_ROOT}}/${{ inputs.deploy-web-app-name }}
+        run: dotnet publish ${{ inputs.project-directory }} -c Release --runtime win-x64 --self-contained -o ${{env.DOTNET_ROOT}}/${{ inputs.deploy-web-app-name }}
         
       - uses: actions/upload-artifact@v2
         if: ${{ inputs.deploy-web-app == true }}
