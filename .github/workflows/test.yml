@@ -8,6 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
+    - name: install az cli
+      run: |
+           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      shell: bash
+    
+    
     - name: azure login
       uses: azure/login@v1
       with:
