@@ -16,13 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-    - name: Azure Login
+    - name: azure login
       uses: azure/login@v1
       with:
         creds: ${{ secrets.azure-cred }}
         allow-no-subscriptions: true
     
-    - name: Azure CLI
+    - name: azure cli
       uses: Azure/cli@v1
       with:
         azcliversion: 2.30.0
