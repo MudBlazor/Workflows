@@ -7,22 +7,9 @@ jobs:
   slot-swap:
     runs-on: ubuntu-latest
     steps:
-    
-    - name: install az cli
-      run: |
-           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-      shell: bash
-    
-    
+
     - name: azure login
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS_TRY_PROD }}
         allow-no-subscriptions: true
-    
-    - name: azure cli
-      uses: Azure/cli@v1
-      with:
-        azcliversion: 2.30.0
-        inlineScript: |
-          az webapp deployment slot swap  --resource-group MudBlazor --name ${{ inputs.azure-app-name }} --slot staging --target-slot production
