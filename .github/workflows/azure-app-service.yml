@@ -17,11 +17,11 @@ jobs:
     steps:
     
     - name: azure login
-      uses: azure/login@v1.4.2
+      uses: azure/login@v1
       with:
         creds: ${{ secrets.azure-cred }}
         allow-no-subscriptions: true
-    
+
     - name: azure cli
       uses: Azure/cli@v1
       with:
