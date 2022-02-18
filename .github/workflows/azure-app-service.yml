@@ -3,7 +3,7 @@ name: azure-app-service
 on:
   workflow_call:
     inputs:
-      deploy-web-app-name:
+      azure-app-name:
         description: 'name of the azure app'
         required: true
         type: string
@@ -27,4 +27,4 @@ jobs:
       with:
         azcliversion: 2.30.0
         inlineScript: |
-          az webapp deployment slot swap  --resource-group MudBlazor --name ${{ inputs.deploy-web-app-name }} --slot staging --target-slot production
+          az webapp deployment slot swap  --resource-group MudBlazor --name ${{ inputs.azure-app-name }} --slot staging --target-slot production
