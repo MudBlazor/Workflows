@@ -1,0 +1,30 @@
+name: azure-app-service
+
+on:
+  workflow_call:
+    inputs:
+      deploy-web-app-name:
+        description: 'name of the azure app'
+        required: true
+        type: string
+    secrets:
+      azure-cred:
+        required: true
+        
+jobs:
+  slot-swap:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Azure Login
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.azure-cred }}
+        allow-no-subscriptions: true
+    
+    - name: Azure CLI
+    - uses: Azure/cli@v1
+      with:
+        azcliversion: 2.30.0
+        inlineScript: |
+          az webapp deployment slot swap  --resource-group MudBlazor --name ${{ inputs.deploy-web-app-name }} --slot staging --target-slot production
