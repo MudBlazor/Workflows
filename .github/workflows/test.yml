@@ -12,6 +12,7 @@ jobs:
       uses: azure/login@v1.4.2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS_TRY_PROD }}
+        enable-AzPSSession: true
         allow-no-subscriptions: true
     
     - name: azure cli
