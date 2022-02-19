@@ -36,15 +36,10 @@ on:
         description: 'path to script folder if you want to check ES6 compliant'
         required: false
         type: string
-        default: ''
       working-directory:
         required: false
         type: string
         default: './src'
-      project-directory:
-        required: false
-        type: string
-        default: './'
       publish-directory:
         required: false
         type: string
@@ -66,11 +61,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install eslint
-        if: ${{ inputs.check-eslint > 0 }}
+        if: ${{ inputs.check-eslint != null }}
         run: npm i -g eslint
 
       - name: Check JS is ES6 compliant
-        if: ${{ inputs.check-eslint > 0 }}
+        if: ${{ inputs.check-eslint != null }}
         run: eslint --env 'es6' ${{ inputs.check-eslint }}
 
       - name: Setup dotnet version
@@ -80,13 +75,13 @@ jobs:
           include-prerelease: ${{ inputs.dotnet-prerelease }}
 
       - name: Restore
-        run: dotnet restore ${{ inputs.project-directory }}
+        run: dotnet restore
 
       - name: Build
-        run: dotnet build ${{ inputs.project-directory }} -c Release --no-restore
+        run: dotnet build -c Release --no-restore
 
       - name: Test
-        run: dotnet test ${{ inputs.project-directory }} -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByAttribute='ExcludeFromCodeCoverage' /p:Include='[MudBlazor]*' /p:SkipAutoProps=true /p:CoverletOutput='./TestResults/'
+        run: dotnet test -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByAttribute='ExcludeFromCodeCoverage' /p:Include='[MudBlazor]*' /p:SkipAutoProps=true /p:CoverletOutput='./TestResults/'
 
       - name: Coverage
         if: ${{ inputs.publish-coverage == true }}
