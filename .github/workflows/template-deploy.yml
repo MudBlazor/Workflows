@@ -8,10 +8,10 @@ on:
         required: false
         type: string
         default: '6.0.x'
-      dotnet-prerelease:
+      dotnet-quality:
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: 'ga'
       deploy-web-app-name:
         description: 'name of the azure app only needed if deploy web app is true'
         required: false
@@ -40,7 +40,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with: 
           dotnet-version: ${{ inputs.dotnet-version }}
-          include-prerelease: ${{ inputs.dotnet-prerelease }}
+          dotnet-quality: ${{ inputs.dotnet-quality }}
           
       - name: publish
         run: dotnet publish ${{ inputs.working-directory }} -c Release --runtime win-x64 --self-contained -o ${{env.DOTNET_ROOT}}/${{ inputs.deploy-web-app-name }}

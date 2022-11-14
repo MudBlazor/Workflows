@@ -8,10 +8,10 @@ on:
         required: false
         type: string
         default: '6.0.x'
-      dotnet-prerelease:
+      dotnet-quality:
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: 'ga'
       publish-coverage:
         required: false
         type: boolean
@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with: 
           dotnet-version: ${{ inputs.dotnet-version }}
-          include-prerelease: ${{ inputs.dotnet-prerelease }}
+          dotnet-quality: ${{ inputs.dotnet-quality }}
 
       - name: Restore
         run: dotnet restore
