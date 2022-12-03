@@ -1,0 +1,74 @@
+name: template-build-test
+
+on:
+  workflow_call:
+    inputs:
+      dotnet-version:
+        description: 'dotnet version to install'
+        required: false
+        type: string
+        default: |
+          6.0.x
+          7.0.x
+      dotnet-quality:
+        description: 'dotnet quality train'
+        required: false
+        type: string
+        default: 'ga'
+      publish-coverage:
+        description: 'publish coverage to codecov'
+        required: false
+        type: boolean
+        default: true
+      check-eslint:
+        description: 'path to script folder you want to check for ES6 compliance'
+        required: false
+        type: string
+      working-directory:
+        description: 'the root of the build'
+        required: false
+        type: string
+        default: './src'
+
+jobs:
+  build-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install eslint
+        if: ${{ inputs.check-eslint != null }}
+        run: npm i -g eslint
+
+      - name: Check JS is ES6 compliant
+        if: ${{ inputs.check-eslint != null }}
+        run: eslint --env 'es6' ${{ inputs.check-eslint }}
+
+      - name: Setup dotnet version
+        uses: actions/setup-dotnet@v3
+        with: 
+          dotnet-version: ${{ inputs.dotnet-version }}
+          dotnet-quality: ${{ inputs.dotnet-quality }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByAttribute='ExcludeFromCodeCoverageAttribute' /p:ExcludeByFile='**/*.g.cs' /p:Include='[MudBlazor]*' /p:SkipAutoProps=true /p:CoverletOutput='./TestResults/'
+
+      - name: Publish coverage
+        if: ${{ inputs.publish-coverage == true }}
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.cobertura.xml
+

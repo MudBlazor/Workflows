@@ -1,0 +1,98 @@
+name: template-deploy-web-app
+
+on:
+  workflow_call:
+    inputs:
+      dotnet-version:
+        description: 'dotnet version to install'
+        required: false
+        type: string
+        default: |
+          6.0.x
+          7.0.x
+      dotnet-quality:
+        description: 'dotnet quality train'
+        required: false
+        type: string
+        default: 'ga'
+      checkout-ref:
+        description: 'defaults to trigger ref (can be overidden to publish tag for example)'
+        required: false
+        type: string
+        default: ${{ github.ref }}
+      web-app-name:
+        description: 'name of the web app'
+        required: true
+        type: string
+      web-app-slot-name:
+        description: 'name of the web app slot'
+        required: false
+        type: string
+        default: 'production'
+      swap-slots:
+        description: 'swap staging to production'
+        required: false
+        type: boolean
+        default: false
+      project-directory:
+        description: 'project directory containing the web app to publish'
+        required: true
+        type: string
+    secrets:
+      publish-profile:
+        required: true
+      azure-cred:
+        required: false
+
+jobs:
+  deploy:
+    name: Deploy web app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.checkout-ref }}
+
+      - name: Cachebust
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/index.html","**/_Layout.cshtml","**/_Host.cshtml"]'
+        env:
+          CACHE_TOKEN: ${{ github.sha }}
+
+      - name: Setup dotnet version
+        uses: actions/setup-dotnet@v3
+        with: 
+          dotnet-version: ${{ inputs.dotnet-version }}
+          dotnet-quality: ${{ inputs.dotnet-quality }}
+
+      - name: Publish
+        run: dotnet publish ${{ inputs.project-directory }} -c Release --runtime win-x64 --self-contained -o ${{ inputs.web-app-name }}
+
+      - name: Create zip package
+        run: (cd ${{ inputs.web-app-name }} && zip -r ../${{ inputs.web-app-name }}.zip .)
+
+      - name: Deploy web app
+        uses: azure/webapps-deploy@v2
+        with: 
+          app-name: ${{ inputs.web-app-name }}
+          slot-name: ${{ inputs.web-app-slot-name }}
+          publish-profile: ${{ secrets.publish-profile }}
+          package: ../${{ inputs.web-app-name }}.zip
+  
+      - name: Azure login
+        if: ${{ inputs.swap-slots == true }}
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.azure-cred }}
+          allow-no-subscriptions: true
+
+      - name: Swap staging to production
+        if: ${{ inputs.swap-slots == true }}
+        uses: Azure/cli@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az webapp deployment slot swap  --resource-group MudBlazor --name ${{ inputs.web-app-name }} --slot staging --target-slot production
+
