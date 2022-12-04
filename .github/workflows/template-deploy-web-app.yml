@@ -15,6 +15,11 @@ on:
         required: false
         type: string
         default: 'ga'
+      checkout-repository:
+        description: 'repository (defaults to current)'
+        required: false
+        type: string
+        default: ${{ github.repository}}
       checkout-ref:
         description: 'defaults to trigger ref (can be overidden to publish tag for example)'
         required: false
