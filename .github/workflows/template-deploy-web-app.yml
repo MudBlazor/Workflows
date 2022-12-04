@@ -79,7 +79,7 @@ jobs:
           app-name: ${{ inputs.web-app-name }}
           slot-name: ${{ inputs.web-app-slot-name }}
           publish-profile: ${{ secrets.publish-profile }}
-          package: ../${{ inputs.web-app-name }}.zip
+          package: ${{ inputs.web-app-name }}
   
       - name: Azure login
         if: ${{ inputs.swap-slots == true }}
