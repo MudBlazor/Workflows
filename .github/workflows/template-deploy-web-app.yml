@@ -57,6 +57,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
+          repository: ${{ inputs.checkout-repository }}
           ref: ${{ inputs.checkout-ref }}
 
       - name: short-sha
