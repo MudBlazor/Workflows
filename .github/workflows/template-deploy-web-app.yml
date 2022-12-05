@@ -59,12 +59,17 @@ jobs:
         with:
           ref: ${{ inputs.checkout-ref }}
 
+      - name: short-sha
+        id: short-sha
+        run: |
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Cachebust
         uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/index.html","**/_Layout.cshtml","**/_Host.cshtml"]'
         env:
-          CACHE_TOKEN: ${{ github.sha }}
+          CACHE_TOKEN: ${{ steps.short-sha.outputs.SHORT_SHA }}
 
       - name: Setup dotnet version
         uses: actions/setup-dotnet@v3
