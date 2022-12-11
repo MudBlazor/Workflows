@@ -60,7 +60,7 @@ jobs:
           repository: ${{ inputs.checkout-repository }}
           ref: ${{ inputs.checkout-ref }}
 
-      - name: uuid
+      - name: Generate UUID
         id: uuid
         run: |
           echo "UUID=$(uuidgen)" >> $GITHUB_OUTPUT
