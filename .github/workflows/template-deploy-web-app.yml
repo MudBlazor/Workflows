@@ -60,17 +60,17 @@ jobs:
           repository: ${{ inputs.checkout-repository }}
           ref: ${{ inputs.checkout-ref }}
 
-      - name: short-sha
-        id: short-sha
+      - name: uuid
+        id: uuid
         run: |
-          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "UUID=$(uuidgen)" >> $GITHUB_OUTPUT
 
       - name: Cachebust
         uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/index.html","**/_Layout.cshtml","**/_Host.cshtml"]'
         env:
-          CACHE_TOKEN: ${{ steps.short-sha.outputs.SHORT_SHA }}
+          CACHE_TOKEN: ${{ steps.uuid.outputs.UUID }}
 
       - name: Setup dotnet version
         uses: actions/setup-dotnet@v3
