@@ -9,7 +9,7 @@ on:
         type: string
         default: |
           6.0.x
-          7.0.203
+          7.0.x
       dotnet-quality:
         description: 'dotnet quality train'
         required: false
