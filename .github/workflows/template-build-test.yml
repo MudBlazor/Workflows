@@ -52,7 +52,7 @@ jobs:
         run: dotnet restore
 
       - name: dotnet format
-        run: dotnet format --verify-no-changes --verbosity diagnostic
+        run: dotnet format --verify-no-changes
 
   build-test:
     name: Build and test
