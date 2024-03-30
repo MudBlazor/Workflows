@@ -51,6 +51,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - uses: xt0rted/dotnet-format-problem-matcher@v1
       - name: dotnet format
         run: dotnet format --verify-no-changes
 
