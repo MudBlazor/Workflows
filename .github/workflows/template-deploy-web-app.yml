@@ -8,8 +8,7 @@ on:
         required: false
         type: string
         default: |
-          6.0.x
-          7.0.x
+          8.0.x
       dotnet-quality:
         description: 'dotnet quality train'
         required: false
@@ -55,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ inputs.checkout-repository }}
           ref: ${{ inputs.checkout-ref }}
@@ -73,7 +72,7 @@ jobs:
           CACHE_TOKEN: ${{ steps.uuid.outputs.UUID }}
 
       - name: Setup dotnet version
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with: 
           dotnet-version: ${{ inputs.dotnet-version }}
           dotnet-quality: ${{ inputs.dotnet-quality }}
