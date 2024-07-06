@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    name: Analyze solution
+    name: Analyze
     runs-on: ubuntu-latest
     steps:
       - name: Set up Java 21
