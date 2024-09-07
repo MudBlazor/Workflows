@@ -81,7 +81,7 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Test
-        run: dotnet test -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s --collect 'XPlat Code Coverage;Format=opencover' --results-directory 'test-results' /p:ExcludeByAttribute='ExcludeFromCodeCoverageAttribute' /p:ExcludeByAttribute='CompilerGeneratedAttribute' /p:ExcludeByFile='**/*.g.cs' /p:SkipAutoProps=true
+        run: dotnet test -c Release --no-build --no-restore --blame-hang --blame-hang-timeout 60s --collect 'XPlat Code Coverage;Format=opencover' --results-directory 'test-results' /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:ExcludeByAttribute='ExcludeFromCodeCoverageAttribute' /p:ExcludeByAttribute='CompilerGeneratedAttribute' /p:ExcludeByFile='**/*.g.cs' /p:SkipAutoProps=true
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
