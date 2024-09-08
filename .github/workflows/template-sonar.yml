@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
           
       - name: Install sonar scanner
-        run: dotnet tool install -g dotnet-sonarscanner    
+        run: dotnet tool install -g dotnet-sonarscanner --version 8.0.1
         
       - name: Cache sonar
         uses: actions/cache@v4
@@ -29,11 +29,17 @@ jobs:
       - name: Restore
         working-directory: './src' 
         run: dotnet restore
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: ./src/TestResults
           
       - name: Analyze
         working-directory: './src' 
         run: |
-          dotnet sonarscanner begin /k:"${{ env.PROJECT_KEY }}" /o:"${{ env.ORGANIZATION }}" /d:sonar.token="${{ env.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.dotnet.excludeTestProjects=true
+          dotnet sonarscanner begin /k:"${{ env.PROJECT_KEY }}" /o:"${{ env.ORGANIZATION }}" /d:sonar.token="${{ env.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.dotnet.excludeTestProjects=true /d:sonar.scanner.scanAll=true /d:sonar.cs.opencover.reportsPaths="**/TestResults/coverage.opencover.xml"
           dotnet build MudBlazor/MudBlazor.csproj -c Release --no-restore --no-incremental
           dotnet sonarscanner end /d:sonar.token="${{ env.SONAR_TOKEN }}"
         env:
