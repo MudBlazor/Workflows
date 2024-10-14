@@ -91,6 +91,6 @@ jobs:
       - name: Publish coverage
         if: ${{ inputs.publish-coverage == true }}
         uses: codecov/codecov-action@v4.6.0
-        env:
-            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
