@@ -43,13 +43,8 @@ on:
         description: 'project directory containing the web app to publish'
         required: true
         type: string
-      second-publish-enabled:
-        description: 'enable second dotnet publish'
-        required: false
-        type: boolean
-        default: false
       second-project-directory:
-        description: 'second project directory to publish'
+        description: 'second project directory to publish (optional)'
         required: false
         type: string
     secrets:
@@ -91,7 +86,7 @@ jobs:
         run: dotnet publish ${{ inputs.project-directory }} -c Release --runtime win-x64 --self-contained -o ${{ inputs.web-app-name }}
 
       - name: Second Publish
-        if: ${{ inputs.second-publish-enabled == true }}
+        if: ${{ inputs.second-project-directory }}
         run: dotnet publish ${{ inputs.second-project-directory }} -c Release --runtime win-x64 --self-contained -o ${{ inputs.web-app-name }}
 
       - name: Create zip package
