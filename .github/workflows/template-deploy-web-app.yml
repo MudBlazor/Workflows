@@ -54,6 +54,9 @@ on:
       azure-cred:
         required: false
 
+env:
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
 jobs:
   deploy:
     name: Deploy web app
@@ -64,6 +67,15 @@ jobs:
         with:
           repository: ${{ inputs.checkout-repository }}
           ref: ${{ inputs.checkout-ref }}
+
+      # Keyed on the checked-out repository, which may differ from the caller
+      # (see MudBlazor/MudBlazor's deploy-trymudblazor.yml).
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          key: ${{ inputs.checkout-repository }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', '**/Directory.Build.props', '**/global.json') }}
+          restore-keys: ${{ inputs.checkout-repository }}-nuget-
+          path: ${{ env.NUGET_PACKAGES }}
 
       - name: Generate UUID
         id: uuid

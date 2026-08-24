@@ -31,6 +31,9 @@ on:
         type: string
         default: './src'
 
+env:
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
 jobs:
   code-quality-check:
     name: Check code quality
@@ -43,12 +46,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          key: ${{ github.repository }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', '**/Directory.Build.props', '**/global.json') }}
+          restore-keys: ${{ github.repository }}-nuget-
+          path: ${{ env.NUGET_PACKAGES }}
+
       - name: Setup dotnet version
         uses: actions/setup-dotnet@v5
-        with: 
+        with:
           dotnet-version: ${{ inputs.dotnet-version }}
           dotnet-quality: ${{ inputs.dotnet-quality }}
-  
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -74,9 +84,18 @@ jobs:
         if: ${{ inputs.check-eslint != null }}
         run: eslint --env 'es6' ${{ inputs.check-eslint }}
 
+      # Restore-only: 'code-quality-check' owns saving the cache. Both jobs restore the
+      # same package set, so a single writer avoids two jobs racing on the same key.
+      - name: Restore NuGet cache
+        uses: actions/cache/restore@v6
+        with:
+          key: ${{ github.repository }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', '**/Directory.Build.props', '**/global.json') }}
+          restore-keys: ${{ github.repository }}-nuget-
+          path: ${{ env.NUGET_PACKAGES }}
+
       - name: Setup dotnet version
         uses: actions/setup-dotnet@v5
-        with: 
+        with:
           dotnet-version: ${{ inputs.dotnet-version }}
           dotnet-quality: ${{ inputs.dotnet-quality }}
 
